@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/@guards/jwt.guard';
-import { GetUser } from 'src/decorators/get-user.decorator';
+import { GetUser } from 'src/decorators/getUser.decorator';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dto/user.dt';
 import { User } from './entities/user.entity';

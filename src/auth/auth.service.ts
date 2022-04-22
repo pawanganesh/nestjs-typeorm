@@ -56,4 +56,16 @@ export class AuthService {
       }),
     };
   }
+
+  async initiateResetPassword(email: string) {
+    await this.userService.initiateResetPassword(email);
+
+    return { message: 'OTP has been sent to your email!' };
+  }
+
+  async finalizeResetPassword(email: string, code: string, password: string) {
+    await this.userService.finalizeResetPassword(email, code, password);
+
+    return { message: 'Password has been successfully reset!' };
+  }
 }

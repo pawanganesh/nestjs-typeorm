@@ -1,7 +1,9 @@
+import { OTP } from 'src/otp/entities/otp.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -57,4 +59,8 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  // relations
+  @OneToMany(() => OTP, (otp) => otp.user)
+  otps: OTP[];
 }
