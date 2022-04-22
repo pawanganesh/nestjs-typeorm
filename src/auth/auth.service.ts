@@ -7,6 +7,7 @@ import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { UserService } from 'src/user/user.service';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -45,7 +46,8 @@ export class AuthService {
     return user;
   }
 
-  async login(user: any) {
+  async login(input: LoginDto) {
+    const user = await this.validateUser(input.email, input.password);
     const payload = { sub: user.id };
     return {
       access_token: await this.jwtService.signAsync(payload, {
