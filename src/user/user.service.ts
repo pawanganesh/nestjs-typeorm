@@ -22,6 +22,13 @@ export class UserService {
     return await this.userRepository.findOne({ where: { email } });
   }
 
+  async getUserByEmailWithPassword(email: string) {
+    return await this.userRepository.findOne({
+      where: { email },
+      select: ['password'],
+    });
+  }
+
   async createUser(user: CreateUserDto) {
     const userInfo = { ...user };
     // console.log(userInfo);
