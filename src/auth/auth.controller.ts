@@ -11,6 +11,7 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { UserDto } from 'src/user/dto/user.dt';
 import { AuthService } from './auth.service';
+import { EmailVerificationDto } from './dto/emailVerification.dto';
 import { LoginDto } from './dto/login.dto';
 import {
   FinalizeResetPasswordDto,
@@ -32,6 +33,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() input: LoginDto) {
     return await this.authService.login(input);
+  }
+
+  @Post('verification')
+  async verifyEmail(@Body() input: EmailVerificationDto) {
+    return this.authService.verifyEmail(input.email, input.code);
   }
 
   @Post('reset-password')

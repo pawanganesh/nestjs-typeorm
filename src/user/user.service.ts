@@ -43,11 +43,26 @@ export class UserService {
     return savedUser;
   }
 
+  async verifyEmail(email: string, code: string) {
+    const user = await this.getUserByEmail(email);
+    if (!user) throw new NotFoundException('User not found');
+
+    const isValid = await this.otpService.validateOtp(
+      user,
+      code,
+      OTPType.emailVerification,
+    );
+    if (!isValid) throw new BadRequestException('Invalid OTP');
+
+    user.isVerified = true;
+    await this.userRepository.save(user);
+  }
+
   async initiateResetPassword(email: string) {
     const user = await this.getUserByEmail(email);
-    if (!user) throw new NotFoundException("User doesn't exist!");
+    if (!user) throw new NotFoundException("User doesn't exist");
 
-    await this.otpService.createOtp(user);
+    await this.otpService.createOtp(user.id, OTPType.passwordReset);
 
     // TODO :: Send email with OTP
 
@@ -57,7 +72,7 @@ export class UserService {
 
   async finalizeResetPassword(email: string, code: string, password: string) {
     const user = await this.getUserByEmail(email);
-    if (!user) throw new NotFoundException("User doesn't exist!");
+    if (!user) throw new NotFoundException("User doesn't exist");
 
     const isValid = await this.otpService.validateOtp(
       user,

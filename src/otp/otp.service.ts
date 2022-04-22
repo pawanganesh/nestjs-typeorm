@@ -12,13 +12,13 @@ export class OtpService {
     private otpRepository: Repository<OTP>,
   ) {}
 
-  createOtp(user: User) {
+  createOtp(userId: number, type: OTPType) {
     const otp = new OTP();
 
     // TODO:: Generate random 6 digit numeric OTP code
     otp.code = '123456';
-    otp.type = OTPType.passwordReset;
-    otp.user = user;
+    otp.type = type;
+    otp.userId = userId;
 
     return this.otpRepository.save(otp);
   }
@@ -30,7 +30,6 @@ export class OtpService {
     const otp = await this.otpRepository.findOne({
       where: { userId: user.id, code, type },
     });
-    console.log(otp);
     if (!otp) throw new BadRequestException('Invalid OTP');
 
     if (otp.createdAt.getTime() + expiryTime < Date.now()) {

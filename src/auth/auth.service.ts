@@ -8,12 +8,15 @@ import { UserService } from 'src/user/user.service';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
+import { OtpService } from 'src/otp/otp.service';
+import { OTPType } from 'src/otp/entities/otp.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private otpService: OtpService,
   ) {}
 
   async register(userDetail: CreateUserDto) {
@@ -24,7 +27,16 @@ export class AuthService {
         message: 'Email already exists',
       });
     }
-    return await this.userService.createUser(userDetail);
+    const { ...savedUser } = await this.userService.createUser(userDetail);
+
+    // TODO: send email with OTP
+    const otp = await this.otpService.createOtp(
+      savedUser.id,
+      OTPType.emailVerification,
+    );
+    // console.log(otp.id);
+
+    return savedUser;
   }
 
   async validateUser(email: string, password: string) {
@@ -34,6 +46,12 @@ export class AuthService {
       throw new UnauthorizedException({
         statusCode: 404,
         message: 'User is not yet registered',
+      });
+
+    if (user.isVerified)
+      throw new UnauthorizedException({
+        statusCode: 401,
+        message: 'User is not yet verified',
       });
 
     const valid = await argon.verify(user.password, password);
@@ -55,6 +73,12 @@ export class AuthService {
         secret: process.env.JWT_SECRET,
       }),
     };
+  }
+
+  async verifyEmail(email: string, code: string) {
+    await this.userService.verifyEmail(email, code);
+
+    return { message: 'Email has been successfully verified!' };
   }
 
   async initiateResetPassword(email: string) {
