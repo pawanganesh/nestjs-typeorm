@@ -11,6 +11,7 @@ import * as argon from 'argon2';
 import { OtpService } from 'src/otp/otp.service';
 import { OTPType } from 'src/otp/entities/otp.entity';
 import { sendMail } from 'src/helpers/mail';
+import { EditUserDto } from './dto/editUser.dto';
 
 @Injectable()
 export class UserService {
@@ -94,5 +95,19 @@ export class UserService {
 
   async getAllUsers() {
     return await this.userRepository.find();
+  }
+
+  async editUser(userId: number, input: EditUserDto) {
+    const { ...user } = input;
+    if (input.password) user.password = await argon.hash(input.password);
+
+    const updatedUser = await this.userRepository
+      .createQueryBuilder()
+      .update(user)
+      .where('id = :id', { id: userId })
+      .returning(['firstName', 'middleName', 'lastName', 'email', 'phone'])
+      .updateEntity(true)
+      .execute();
+    return updatedUser.raw[0];
   }
 }

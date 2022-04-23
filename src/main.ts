@@ -3,6 +3,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
+import * as csurf from 'csurf';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,6 +29,9 @@ async function bootstrap() {
 
   // CORS setup
   app.enableCors();
+
+  // CSRF setup
+  // app.use(csurf());
 
   // App versioning
   app.enableVersioning({
