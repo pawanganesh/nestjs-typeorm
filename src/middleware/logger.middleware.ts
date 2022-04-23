@@ -1,11 +1,12 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { createLogger, format, transports } from 'winston';
+const { combine, label, timestamp, prettyPrint } = format;
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
   logger = createLogger({
-    format: format.json(),
+    format: combine(timestamp(), prettyPrint()),
     transports: [
       new transports.Console(),
       new transports.File({ filename: 'logs/access.log' }),
