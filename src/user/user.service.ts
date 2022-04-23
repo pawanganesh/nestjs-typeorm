@@ -10,6 +10,7 @@ import { User } from './entities/user.entity';
 import * as argon from 'argon2';
 import { OtpService } from 'src/otp/otp.service';
 import { OTPType } from 'src/otp/entities/otp.entity';
+import { sendMail } from 'src/helpers/mail';
 
 @Injectable()
 export class UserService {
@@ -62,9 +63,14 @@ export class UserService {
     const user = await this.getUserByEmail(email);
     if (!user) throw new NotFoundException("User doesn't exist");
 
-    await this.otpService.createOtp(user.id, OTPType.passwordReset);
+    const otp = await this.otpService.createOtp(user.id, OTPType.passwordReset);
 
     // TODO :: Send email with OTP
+    sendMail({
+      to: email,
+      subject: 'Password Reset',
+      text: `Your Password Reset OTP is: ${otp.code}`,
+    });
 
     user.passwordResetRequested = true;
     await this.userRepository.save(user);

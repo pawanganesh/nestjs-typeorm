@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { OtpService } from 'src/otp/otp.service';
 import { OTPType } from 'src/otp/entities/otp.entity';
+import { sendMail } from 'src/helpers/mail';
 
 @Injectable()
 export class AuthService {
@@ -34,7 +35,11 @@ export class AuthService {
       savedUser.id,
       OTPType.emailVerification,
     );
-    // console.log(otp.id);
+    sendMail({
+      to: savedUser.email,
+      subject: 'Email Verification',
+      text: `Your Email Verification OTP is ${otp.code}`,
+    });
 
     return savedUser;
   }
