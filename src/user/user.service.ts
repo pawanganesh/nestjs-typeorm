@@ -85,4 +85,8 @@ export class UserService {
     user.password = await argon.hash(password);
     await this.userRepository.save(user);
   }
+
+  async getAllUsers() {
+    return await this.userRepository.find();
+  }
 }
